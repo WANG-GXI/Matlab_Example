@@ -1,0 +1,26 @@
+------------------------------------------------------
+有四个工人，要指派他们分别完成4项工作，每人做各项工作所消耗的时间如表。问指派哪个人去完成哪项工作，可使总的消耗时间为最小？
+
+图片链接
+【 https://wkbjcloudbos.bdimg.com/v1/docconvert3913/wk/ae30d7034a5891862a438dc6c5012e0a/0.png?responseContentType=image%2Fpng&responseCacheControl=max-age%3D3888000&responseExpires=Thu%2C%2001%20Apr%202021%2020%3A30%3A51%20%2B0800&authorization=bce-auth-v1%2Ffa1126e91489401fa7cc85045ce7179e%2F2021-02-15T12%3A30%3A51Z%2F3600%2Fhost%2F1d9b0c91982e14091024df63427b0b1ca4c926079809cbaab9db26bf4e41783b&x-bce-range=0-6040&token=eyJ0eXAiOiJKSVQiLCJ2ZXIiOiIxLjAiLCJhbGciOiJIUzI1NiIsImV4cCI6MTYxMzM5NTg1MSwidXJpIjp0cnVlLCJwYXJhbXMiOlsicmVzcG9uc2VDb250ZW50VHlwZSIsInJlc3BvbnNlQ2FjaGVDb250cm9sI
+iwicmVzcG9uc2VFeHBpcmVzIiwieC1iY2UtcmFuZ2UiXX0%3D.z25rYDvaQR9ZClEQOA%2FhHaRjSm%2BlV9OgIpx0WQ9D2OI%3D.1613395851  】
+------------------------------------------------------
+%保存不同数据
+c = [15 18 21 24;19 23 22 18;26 17 16 19;19 21 23 17];  
+%将矩阵转化为向量
+c = c(:);
+%生成8x16的0矩阵
+a = zeros(8,16);
+%0-1规划在循环中变为线性规划
+for i=1:4
+    a(i,(i-1)*4+1:4*i)=1;  %每一行各元素相加为1
+    a(4+i,i:4:16)=1;       %每一列各元素相加为1
+end
+%生成8x1的1矩阵
+b = ones(8,1);
+[x,y] = linprog(c,[],[],a,b,zeros(16,1),ones(16,1));
+%生成一个4x4的矩阵来反映指派结果
+X = reshape(x,4,4)
+%输出总时间
+OutPut = y
+------------------------------------------------------
