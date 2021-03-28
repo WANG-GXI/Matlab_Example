@@ -1,0 +1,52 @@
+% 数据准备
+Q=0.5;    %加权系数
+syms a b;                                                %建立符号变量a(发展系数)和b(灰作用量)
+c=[a,b]';
+A = [23390,26743,26634,25947];                          %原始数列 A
+n = length(A);                                           %求出A中元素个数
+years=1;                                                %预测未来年数
+B = cumsum(A);                                           %对原始数列 A 做累加得到数列 B
+for i = 2:n                                              %对数列 B 做紧邻均值生成
+    C(i) = Q*B(i) + (1-Q)*B(i - 1);                          
+end
+C(1) = [];                                               %这里注意C中元素个数为n-1所以删去第一列
+B=[-C;ones(1,n-1)]';                                     %构造数据矩阵 
+Y=A(2:n)';
+% 最小二乘法计算参数并求出预测数据
+c=inv(B'*B)*B'*Y;                                        %使用最小二乘法计算参数 a(发展系数)和b(灰作用量)
+a=c(1);b=c(2);
+%预测未来数据
+F = []; F(1) = A(1);        
+for i = 2:(n+years)
+    F(i) = (A(1)-b/a)/exp(a*(i-1))+ b/a;
+end
+G = []; G(1) = A(1);                                     %对数列 F 累减还原,得到预测出的数据
+for i = 2:(n+years)
+    G(i) = F(i) - F(i-1);                                %得到预测出来的数据
+end
+disp(['预测数据为：',num2str(G)]);
+% 模型检验
+%计算残差
+H = G(1:n);                                     
+epsilon = A - H;
+%计算相对误差q
+q= abs(epsilon./A);
+Q=mean(q);
+disp(['相对残差Q检验：',num2str(Q)]);
+%方差比C检验
+C = std(epsilon, 1)/std(A, 1);
+disp(['方差比C检验：',num2str(C)]);
+%小误差概率P检验
+S1 = std(A, 1);
+temp = find(abs(epsilon - mean(epsilon))< 0.6745 * S1); %找到数据中满足条件数据位置
+P = length(temp)/n;                                     %求出满足条件个数然后除以总个数求出概率
+disp(['小误差概率P检验：',num2str(P)]);
+% 绘图
+t1 = 2012:2015;
+t2 = 2012:2016;
+plot(t1, A,'r*'); hold on;
+plot(t2, G, 'b-');
+xlabel('年份'); ylabel('污水量/亿吨');
+legend('实际量','预测量');
+title('增长曲线');
+grid on;                                                %显示网格
